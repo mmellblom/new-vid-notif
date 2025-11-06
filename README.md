@@ -28,26 +28,61 @@ A Python script that monitors your subscribed YouTube channels and sends Windows
 
 ## Setup
 
-### 1. Add Channels to Monitor
+### Option A: Automatically Sync from Your YouTube Account (Recommended)
 
-Run the setup script to add channels:
+**This automatically fetches all channels you're subscribed to on YouTube!**
 
-```bash
-python setup.py
-```
+> **Note:** You don't need to manually add channels if you use the `sync` command. It will automatically fetch all channels from your YouTube subscribed list!
 
-Then use the interactive commands:
-- `add <channel_url>` - Add a channel to monitor
-  - Examples:
-    - `add https://www.youtube.com/@channelname`
-    - `add https://www.youtube.com/c/channelname`
-    - `add https://www.youtube.com/channel/UCxxxxxxxxxxxxx`
-- `list` - List all monitored channels
-- `remove <channel_name>` - Remove a channel
-- `check` - Manually check for new videos
-- `quit` - Exit setup
+1. **Set up YouTube Data API credentials:**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project (or select an existing one)
+   - Enable the **YouTube Data API v3**:
+     - Go to "APIs & Services" > "Library"
+     - Search for "YouTube Data API v3"
+     - Click "Enable"
+   - Create OAuth 2.0 credentials:
+     - Go to "APIs & Services" > "Credentials"
+     - Click "Create Credentials" > "OAuth client ID"
+     - Choose "Desktop app" as the application type
+     - Name it (e.g., "YouTube Notifier")
+     - Click "Create"
+   - Download the credentials:
+     - Click the download icon next to your OAuth client
+     - Save the JSON file as `credentials.json` in the project directory
 
-### 2. Configure Settings
+2. **Sync your subscribed channels:**
+   ```bash
+   python setup.py
+   ```
+   Then type: `sync`
+   - This will open a browser for authentication
+   - Sign in with your YouTube account
+   - Grant permissions to read your subscriptions
+   - All your subscribed channels will be automatically added!
+
+### Option B: Manually Add Channels
+
+If you prefer to manually add channels or don't want to set up API credentials:
+
+1. **Run the setup script:**
+   ```bash
+   python setup.py
+   ```
+
+2. **Use the interactive commands:**
+   - `add <channel_url>` - Add a channel to monitor
+     - Examples:
+       - `add https://www.youtube.com/@channelname`
+       - `add https://www.youtube.com/c/channelname`
+       - `add https://www.youtube.com/channel/UCxxxxxxxxxxxxx`
+   - `sync` - Sync channels from your YouTube account (requires API setup)
+   - `list` - List all monitored channels
+   - `remove <channel_name>` - Remove a channel
+   - `check` - Manually check for new videos
+   - `quit` - Exit setup
+
+### Configure Settings
 
 Edit `config.json` to customize settings:
 

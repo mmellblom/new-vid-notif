@@ -27,6 +27,8 @@ wheels/
 videos.db
 *.db
 config.json
+credentials.json
+token.pickle
 
 # IDE
 .vscode/

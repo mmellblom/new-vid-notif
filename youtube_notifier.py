@@ -14,6 +14,12 @@ from typing import List, Dict, Optional
 import yt_dlp
 from plyer import notification
 
+try:
+    from youtube_api import YouTubeAPI
+    API_AVAILABLE = True
+except ImportError:
+    API_AVAILABLE = False
+
 
 class YouTubeNotifier:
     def __init__(self, config_path: str = "config.json", db_path: str = "videos.db"):
@@ -247,6 +253,73 @@ class YouTubeNotifier:
         else:
             print(f"Channel not found: {channel_name}")
             return False
+    
+    def sync_from_youtube_account(self, replace_existing: bool = False) -> int:
+        """
+        Automatically fetch and add all channels from your YouTube subscribed list.
+        
+        Args:
+            replace_existing: If True, replace existing channels. If False, merge with existing.
+            
+        Returns:
+            Number of channels added
+        """
+        if not API_AVAILABLE:
+            print("YouTube Data API not available. Install required packages:")
+            print("pip install google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client")
+            return 0
+        
+        print("Authenticating with YouTube...")
+        api = YouTubeAPI()
+        
+        if not api.authenticate():
+            print("Failed to authenticate with YouTube. Please check your credentials.")
+            return 0
+        
+        print("Fetching your subscribed channels...")
+        subscribed_channels = api.get_subscribed_channels(max_results=200)
+        
+        if not subscribed_channels:
+            print("No subscribed channels found or error fetching channels.")
+            return 0
+        
+        print(f"Found {len(subscribed_channels)} subscribed channels.")
+        
+        if replace_existing:
+            self.config['channels'] = []
+            print("Replacing existing channels...")
+        else:
+            print("Merging with existing channels...")
+        
+        added_count = 0
+        skipped_count = 0
+        
+        for channel in subscribed_channels:
+            channel_id = channel.get('channel_id')
+            
+            # Check if channel already exists
+            if any(ch.get('channel_id') == channel_id for ch in self.config['channels']):
+                skipped_count += 1
+                continue
+            
+            self.config['channels'].append({
+                'channel_id': channel_id,
+                'channel_name': channel.get('channel_name', 'Unknown'),
+                'channel_url': channel.get('channel_url', ''),
+                'added_at': datetime.now().isoformat(),
+                'synced_from_account': True
+            })
+            added_count += 1
+        
+        self._save_config()
+        
+        print(f"\nSync complete!")
+        print(f"  Added: {added_count} channels")
+        if skipped_count > 0:
+            print(f"  Skipped: {skipped_count} channels (already in list)")
+        print(f"  Total monitored: {len(self.config['channels'])} channels")
+        
+        return added_count
 
 
 def main():

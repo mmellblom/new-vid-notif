@@ -14,6 +14,7 @@ def main():
     print("=" * 40)
     print("\nCommands:")
     print("  add <channel_url>  - Add a channel to monitor")
+    print("  sync              - Sync channels from your YouTube account (requires API setup)")
     print("  list               - List all monitored channels")
     print("  remove <name>      - Remove a channel")
     print("  check              - Check for new videos now")
@@ -34,6 +35,11 @@ def main():
             elif cmd == 'add' and len(command) > 1:
                 channel_url = ' '.join(command[1:])
                 notifier.add_channel(channel_url)
+            elif cmd == 'sync':
+                print("\nSyncing channels from your YouTube account...")
+                print("(This will open a browser for authentication)")
+                replace = input("Replace existing channels? (y/N): ").strip().lower() == 'y'
+                notifier.sync_from_youtube_account(replace_existing=replace)
             elif cmd == 'list':
                 notifier.list_channels()
             elif cmd == 'remove' and len(command) > 1:
@@ -44,6 +50,7 @@ def main():
             elif cmd == 'help':
                 print("\nCommands:")
                 print("  add <channel_url>  - Add a channel to monitor")
+                print("  sync              - Sync channels from your YouTube account (requires API setup)")
                 print("  list               - List all monitored channels")
                 print("  remove <name>      - Remove a channel")
                 print("  check              - Check for new videos now")
